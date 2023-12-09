@@ -1,5 +1,13 @@
 controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+  resource:
+    path: ../src/Controller/
+    namespace: App\Controller
+  type: attribute
+
+profile_check:
+  path: /profile_check
+agence_check:
+  path: /agence_check
+site_logout:
+  path: /logout
+  methods: GET

@@ -1,0 +1,73 @@
+security:
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "bcrypt"
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Entity\User
+        property: email
+    app_agence_provider:
+      entity:
+        class: App\Entity\Agence
+        property: email
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    user_area:
+      lazy: true
+      pattern: ^/profile
+      provider: app_user_provider
+      form_login:
+        login_path: user_login
+        check_path: /profile_check
+        default_target_path: user_login
+        username_parameter: email
+        password_parameter: password
+      entry_point: form_login
+      logout:
+        path: app_logout
+        target: app_login
+      custom_authenticator: App\Security\UserAuthenticator
+      remember_me:
+        secret: "%kernel.secret%"
+        lifetime: 604800
+        path: /
+        always_remember_me: true
+
+    agence_area:
+      pattern: ^/agence
+      provider: app_agence_provider
+      form_login:
+        login_path: agence_login
+        check_path: /agence_check
+        default_target_path: agence_login
+        username_parameter: email
+        password_parameter: password
+      entry_point: form_login
+      logout:
+        path: app_logout
+        target: agence_login
+      custom_authenticator: App\Security\AgenceAuthenticator
+
+      remember_me:
+        secret: "%kernel.secret%"
+        lifetime: 604800
+        path: /home
+        always_remember_me: true
+
+  access_control:
+    #- { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/agence, roles: ROLE_AGENCE }
+    - { path: ^/profile, roles: ROLE_USER }
+    - { path: ^/logout, roles: [IS_AUTHENTICATED_ANONYMOUSLY] }
+
+when@test:
+  security:
+    password_hashers:
+      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+        algorithm: auto
+        cost: 4 # Lowest possible value for bcrypt
+        time_cost: 3 # Lowest possible value for argon
+        memory_cost: 10 # Lowest possible value for argon
